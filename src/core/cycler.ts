@@ -23,6 +23,8 @@ export interface CyclerContext {
   pool: readonly string[];
   rng: () => number;
   intervalMs: number;
+  /** A preset already prepared (shaders prewarmed); used for advances when still eligible. */
+  preferred?: string;
 }
 
 export interface Load {
@@ -59,6 +61,10 @@ function navigateTo(state: CyclerState, name: string, blend: number, now: number
 }
 
 function advance(state: CyclerState, context: CyclerContext, blend: number): Decision {
+  const { preferred } = context;
+  if (preferred && preferred !== currentPreset(state) && context.pool.includes(preferred)) {
+    return navigateTo(state, preferred, blend, context.now);
+  }
   const recent = state.history.slice(0, state.cursor + 1);
   const next = pickRandom(context.pool, recent, context.rng);
   if (next === null) return { state };

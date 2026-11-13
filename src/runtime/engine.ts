@@ -1,6 +1,7 @@
 import butterchurn from "butterchurn";
 import "../imported/plugin-visualizer-butterchurnExtraImages";
 import { importedPresets } from "../imported/full-presets";
+import { prewarmShaders } from "./shaderPrewarm";
 
 type Visualizer = {
   connectAudio(node: AudioNode): void;
@@ -8,6 +9,7 @@ type Visualizer = {
   loadExtraImages(images: unknown): void;
   setRendererSize(width: number, height: number): void;
   render(): void;
+  renderer: Parameters<typeof prewarmShaders>[0];
 };
 
 const presets: Record<string, unknown> = importedPresets.getPresets();
@@ -24,6 +26,7 @@ export function createEngine(getRenderScale: () => number) {
   let visualizer: Visualizer | null = null;
   let frame = 0;
   let running = false;
+  let cancelPrewarm: () => void = () => {};
 
   function size() {
     const scale = getRenderScale();
@@ -76,12 +79,24 @@ export function createEngine(getRenderScale: () => number) {
       renderLoop();
     },
     stop() {
+      cancelPrewarm();
       running = false;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       canvas.style.display = "none";
     },
     resize,
+    /** Compile a preset's shaders in the background so switching to it later does not hitch. */
+    prewarm(name: string) {
+      cancelPrewarm();
+      const preset = presets[name] as { warp?: string; comp?: string } | undefined;
+      if (!visualizer || !preset) return;
+      try {
+        cancelPrewarm = prewarmShaders(visualizer.renderer, preset);
+      } catch (error) {
+        console.warn(`[Butterchurn+] prewarm failed for ${name}`, error);
+      }
+    },
     /** Throws if the preset is unknown or butterchurn fails to compile it. */
     load(name: string, blendSeconds: number) {
       const preset = presets[name];

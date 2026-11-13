@@ -1,25 +1,22 @@
 import { AppleMusic, useCiderAudio } from "@ciderapp/pluginkit";
 import { currentPreset, decide, initialState, type CyclerState, type Intent } from "../core/cycler";
 import type { HotkeyAction } from "../core/hotkeys";
-import { eligiblePresets, type PoolFallback } from "../core/presetPool";
 import { trackKey } from "../core/trackKey";
 import { openConfig } from "./configModal";
-import { createEngine, presetNames } from "./engine";
+import { createEngine } from "./engine";
 import { createHud } from "./hud";
+import { createPresetSession } from "./presetSession";
 import { settings, toggleInList } from "./settingsStore";
 import { startBeatWatcher, startHotkeys, startSongWatcher, startTicker, type Dispose } from "./triggers";
 
 const MAX_CHAINED_FAILURES = 5;
-const FAILURES_BEFORE_SKIP = 2;
 
 const audio = useCiderAudio();
 const engine = createEngine(() => settings.renderScale);
 const hud = createHud();
-const failures = new Map<string, number>();
-const sessionSkip = new Set<string>();
+const session = createPresetSession((message) => hud.toast(message));
 let cycler: CyclerState = initialState(settings.selected, Date.now());
 let disposers: Dispose[] = [];
-let warnedFallback: PoolFallback = "none";
 let waitingForAudio = false;
 
 function readNowPlayingKey(): string | null {
@@ -30,43 +27,34 @@ function readNowPlayingKey(): string | null {
   }
 }
 
-function currentPool(): string[] {
-  const { pool, fallback } = eligiblePresets(presetNames, { ...settings, skip: sessionSkip });
-  if (fallback !== "none" && fallback !== warnedFallback) {
-    hud.toast(fallback === "all" ? "Every preset is blocked; using all presets" : "No favourites available; using all presets");
-  }
-  warnedFallback = fallback;
-  return pool;
-}
-
 function describe(name: string): string {
   const marks = [cycler.locked ? "🔒" : "", settings.favorites.includes(name) ? "⭐" : ""].join("");
   return `${marks}${marks ? " " : ""}${name}`;
 }
 
-function recordFailure(name: string, error: unknown) {
-  console.error(`[Butterchurn+] preset failed: ${name}`, error);
-  const count = (failures.get(name) ?? 0) + 1;
-  failures.set(name, count);
-  if (count >= FAILURES_BEFORE_SKIP) sessionSkip.add(name);
+function afterLoad(name: string) {
+  settings.selected = name;
+  if (settings.showHud) hud.presetName(describe(name));
+  const next = session.queueNext(cycler.history.slice(0, cycler.cursor + 1));
+  if (next) engine.prewarm(next);
 }
 
 function dispatch(intent: Intent, depth = 0) {
   const decision = decide(cycler, intent, {
     now: Date.now(),
-    pool: currentPool(),
+    pool: session.pool(),
     rng: Math.random,
     intervalMs: settings.intervalSec * 1000,
+    preferred: session.queued(),
   });
   cycler = decision.state;
   if (!decision.load) return;
   const { name, blend } = decision.load;
   try {
     engine.load(name, blend);
-    settings.selected = name;
-    if (settings.showHud) hud.presetName(describe(name));
+    afterLoad(name);
   } catch (error) {
-    recordFailure(name, error);
+    session.recordFailure(name, error);
     if (depth < MAX_CHAINED_FAILURES) dispatch({ type: "failed" }, depth + 1);
   }
 }
@@ -159,8 +147,9 @@ export function start() {
   cycler = initialState(settings.selected, Date.now());
   try {
     engine.load(settings.selected, 0);
+    afterLoad(settings.selected);
   } catch (error) {
-    recordFailure(settings.selected, error);
+    session.recordFailure(settings.selected, error);
     dispatch({ type: "failed" });
   }
   startTriggers(context, source);

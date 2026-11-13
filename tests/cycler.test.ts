@@ -162,3 +162,29 @@ describe("degenerate pools", () => {
     expect(decide(state(), { type: "random" }, ctx(1, { pool: ["a"] })).load).toBeUndefined();
   });
 });
+
+describe("preferred (prewarmed) next preset", () => {
+  it("advances to the preferred preset when it is eligible", () => {
+    expect(decide(state(), { type: "random" }, ctx(1, { preferred: "d" })).load?.name).toBe("d");
+    expect(decide(state(), { type: "auto", source: "timer" }, ctx(30_000, { preferred: "e" })).load?.name).toBe("e");
+  });
+
+  it("ignores a preferred preset that left the pool", () => {
+    expect(decide(state(), { type: "random" }, ctx(1, { preferred: "zz" })).load?.name).toBe("b");
+  });
+
+  it("ignores a preferred preset that is already showing", () => {
+    expect(decide(state(), { type: "random" }, ctx(1, { preferred: "a" })).load?.name).toBe("b");
+  });
+
+  it("does not affect prev or select", () => {
+    const s = state({ history: ["a", "b"], cursor: 1 });
+    expect(decide(s, { type: "prev" }, ctx(1, { preferred: "e" })).load?.name).toBe("a");
+    expect(decide(s, { type: "select", name: "c" }, ctx(1, { preferred: "e" })).load?.name).toBe("c");
+  });
+
+  it("still respects lock and dwell", () => {
+    expect(decide(state({ locked: true }), { type: "auto", source: "timer" }, ctx(99_999, { preferred: "d" })).load).toBeUndefined();
+    expect(decide(state(), { type: "auto", source: "beat" }, ctx(1, { preferred: "d" })).load).toBeUndefined();
+  });
+});
