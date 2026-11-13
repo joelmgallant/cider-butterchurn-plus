@@ -17,17 +17,17 @@ yarn install-local   # build and copy into Cider 4's plugins dir, then restart C
 
 Design: `docs/superpowers/specs/2026-11-12-butterchurn-fork-design.md`.
 
-## Manual verification checklist (Cider)
+## Manual verification checklist (Cider) — passed 2026-11-13
 
-- [ ] Main menu "Open Visualizer (Butterchurn+)" starts it; first run shows the `?` hint toast
-- [ ] Timer cycles at the configured interval; a manual switch resets the timer
-- [ ] Skipping a track changes preset
-- [ ] A big drop changes preset (at most once per 20 s)
-- [ ] `N` `P` `L` `F` `B` `H` `?` `Esc` all behave; typing in the settings search box does not trigger them
-- [ ] Lock blocks timer, song and drop changes; `N` still works while locked
-- [ ] Immersive layout "Butterchurn+ Visualizer" works and closing immersive stops the visualizer
-- [ ] Open/close 10 times: no speed-up, no duplicate switches
-- [ ] Render scale 1 vs 2 visibly changes sharpness
+- [x] Main menu "Open Visualizer (Butterchurn+)" starts it; first run shows the `?` hint toast
+- [x] Timer cycles at the configured interval; a manual switch resets the timer
+- [x] Skipping a track changes preset
+- [x] A big drop changes preset (at most once per 20 s)
+- [x] `N` `P` `L` `F` `B` `H` `?` `Esc` all behave; typing in the settings search box does not trigger them
+- [x] Lock blocks timer, song and drop changes; `N` still works while locked
+- [x] Immersive layout "Butterchurn+ Visualizer" works and closing immersive stops the visualizer
+- [x] Open/close 10 times: no speed-up, no duplicate switches
+- [x] Render scale 1 vs 2 visibly changes sharpness
 
 ---
 
