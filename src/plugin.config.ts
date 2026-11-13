@@ -1,12 +1,10 @@
-import { createId } from "@paralleldrive/cuid2"
-
 export default {
-    ce_prefix: createId(),
-    identifier: 'dev.booploops.butterchurn-visualizer',
-    name: 'Butterchurn Visualizer for Cider',
-    description: 'Adds a visualizer to the app.',
-    version: '0.0.3',
-    author: 'booploops',
+    ce_prefix: 'bcplus',
+    identifier: 'com.joelmgallant.butterchurn',
+    name: 'Butterchurn+',
+    description: 'Butterchurn visualizer with auto-cycling presets, hotkeys and a blocklist. Fork of booploops/Cider-Butterchurn.',
+    version: '2.0.0',
+    author: 'joelmgallant (fork of booploops)',
     repo: 'https://github.com/booploops/Cider-Butterchurn',
     entry: {
         'plugin.js': {
