@@ -20,7 +20,7 @@ Global constraints: yarn 4 + Vite 7 + Vue 3.5 (existing); Vitest added for tests
 ## Stage 3: Pure core — cycler
 **Goal:** `decide()` implements every row of the spec's intent table.
 **Success Criteria:** tests for lock, dwell, debounce, timer reset, history prev/truncate, block, empty pool.
-**Status:** Not Started
+**Status:** Complete
 
 ## Stage 4: Pure core — bassEnergy + beatDetector
 **Goal:** Drop detection from synthetic energy series.
