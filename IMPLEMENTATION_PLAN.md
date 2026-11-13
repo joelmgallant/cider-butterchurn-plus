@@ -15,7 +15,7 @@ Global constraints: yarn 4 + Vite 7 + Vue 3.5 (existing); Vitest added for tests
 **Goal:** Typed settings with migration; pool filtering + random pick; key → action map.
 **Success Criteria:** all unit tests green.
 **Tests:** defaults, per-field corruption, legacy `bc-*` migration; blocklist/favourites/fallback; no-repeat window incl. tiny pools; hotkey mapping ignores inputs + modifiers.
-**Status:** Not Started
+**Status:** Complete
 
 ## Stage 3: Pure core — cycler
 **Goal:** `decide()` implements every row of the spec's intent table.
