@@ -25,7 +25,7 @@ Global constraints: yarn 4 + Vite 7 + Vue 3.5 (existing); Vitest added for tests
 ## Stage 4: Pure core — bassEnergy + beatDetector
 **Goal:** Drop detection from synthetic energy series.
 **Success Criteria:** steady loud signal → no drop; quiet→loud jump → one drop; refractory respected; silence → none; sensitivity ordering holds.
-**Status:** Not Started
+**Status:** Complete
 
 ## Stage 5: Runtime — engine, triggers, HUD, controller, Vue wiring
 **Goal:** Replace `port.ts`/`_amOT` with runtime modules; settings panel gains cycling/blocklist UI; `?` cheat sheet.
