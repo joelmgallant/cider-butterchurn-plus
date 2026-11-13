@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import CComponent from "@ciderapp/pluginkit/vue/CComponent.vue";
 import { useCiderAudio } from "@ciderapp/pluginkit";
-import { _amOT } from "../imported/port";
+import * as controller from "../runtime/controller";
+import { openConfig } from "../runtime/configModal";
 import { useIdle } from "@vueuse/core";
 
 const { idle } = useIdle(1000);
@@ -23,8 +24,8 @@ const audio = useCiderAudio();
 const unsubscribe: any = audio.subscribe(
   "ready",
   () => {
-    if (!_amOT.viz.running) {
-      _amOT.StartViz();
+    if (!controller.isRunning()) {
+      controller.start();
     }
   },
   {
@@ -78,8 +79,8 @@ onUnmounted(() => {
   }
 
   unsubscribe();
-  if (_amOT.viz.running) {
-    _amOT.StopViz();
+  if (controller.isRunning()) {
+    controller.stop();
   }
   document
     .querySelector(".player-modal")
@@ -123,7 +124,7 @@ onUnmounted(() => {
           }"
         ></CComponent>
       </div>
-      <button class="config-button" @click="_amOT.VizConfig">
+      <button class="config-button" @click="openConfig">
         <CComponent
           name="NIcon"
           :component-props="{

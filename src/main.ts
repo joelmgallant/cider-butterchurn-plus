@@ -1,7 +1,8 @@
 import { defineCustomElement } from "vue";
 import { addImmersiveMenuEntry, addMainMenuEntry } from "@ciderapp/pluginkit";
 import { definePluginContext } from "@ciderapp/pluginkit";
-import { _amOT } from "./imported/port.js";
+import * as controller from "./runtime/controller";
+import { openConfig } from "./runtime/configModal";
 import "./imported/style.scss";
 import PluginSettings from "./components/PluginSettings.vue";
 import VizSettings from "./components/VizSettings.vue";
@@ -44,40 +45,31 @@ const { plugin, setupConfig, customElementName, goToPage, useCPlugin } = defineP
         this.SettingsElement = customElementName('plugin-settings');
 
         subscribeEvent('immersive:closed', () => {
-            if (_amOT.viz.running) {
-                _amOT.StopViz();
+            if (controller.isRunning()) {
+                controller.stop();
             }
         })
 
-        // useMusicKit().addEventListener(MusicKit.Events.nowPlayingItemDidChange, (e) => {
-        //     if(!_amOT.viz.running) return;
-        //     // @ts-ignore
-        //     _amOT.viz.visualizer?.launchSongTitleAnim(e?.item?.title)
-        // })
-
         addImmersiveLayout({
-            name: "Visualizer Centered",
-            identifier: "booploops-butterchurn-visualizer",
+            name: "Butterchurn+ Visualizer",
+            identifier: "bcplus-visualizer-centered",
             component: customElementName('immersive-layout'),
             type: 'normal',
         })
 
         addMainMenuEntry({
-            label: "Open Visualizer",
+            label: "Open Visualizer (Butterchurn+)",
             onClick() {
-                // goToPage({
-                //     name: 'page-helloworld'
-                // });
-                _amOT.VizToggle();
+                controller.toggle();
             },
         })
 
         addImmersiveMenuEntry({
             label: "Toggle Visualizer",
             onClick() {
-                _amOT.VizToggle();
+                controller.toggle();
 
-                if (!_amOT.viz.running) {
+                if (!controller.isRunning()) {
                     document.querySelector('.player-modal')?.classList.remove('force-transparent')
                     document.querySelector('.blurmap')?.classList.remove('hidden')
                 } else {
@@ -90,7 +82,7 @@ const { plugin, setupConfig, customElementName, goToPage, useCPlugin } = defineP
         addImmersiveMenuEntry({
             label: "Configure Visualizer",
             onClick() {
-                _amOT.VizConfig();
+                openConfig();
             },
         })
 

@@ -31,7 +31,7 @@ Global constraints: yarn 4 + Vite 7 + Vue 3.5 (existing); Vitest added for tests
 **Goal:** Replace `port.ts`/`_amOT` with runtime modules; settings panel gains cycling/blocklist UI; `?` cheat sheet.
 **Success Criteria:** `vue-tsc --noEmit` clean for new code, `yarn build` succeeds, no references to `_amOT` remain, bundle installs into Cider.
 **Tests:** unit tests stay green; manual Cider checklist (Stage 6).
-**Status:** Not Started
+**Status:** Complete
 
 ## Stage 6: Install + manual verification
 **Goal:** Installed in Cider, original disabled.
