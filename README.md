@@ -1,3 +1,36 @@
+# Butterchurn+ (personal fork)
+
+Fork of [booploops/Cider-Butterchurn](https://github.com/booploops/Cider-Butterchurn) with:
+
+- **Auto-cycling presets**: on a timer (5–300 s), on song change, and on big bass drops, arbitrated so they never double-switch.
+- **Hotkeys** while the visualizer is showing: `N` next (random), `P` previous, `L` lock, `F` favourite, `B` blocklist + skip, `H` toggle preset name, `?` cheat sheet.
+- **Blocklist and favourites-only pool**, editable in the settings panel (right-click or double-click the visualizer).
+- Fixes: no AudioContext leak per toggle, no `alert()`, Retina no longer simulates 4× the pixels it shows, listeners torn down on stop.
+
+Identifier `com.joelmgallant.butterchurn`. Settings migrate from the original plugin's `bc-*` keys on first run.
+
+```sh
+yarn install
+yarn test            # Vitest unit tests for src/core
+yarn install-local   # build and copy into Cider 4's plugins dir, then restart Cider
+```
+
+Design: `docs/superpowers/specs/2026-11-12-butterchurn-fork-design.md`.
+
+## Manual verification checklist (Cider)
+
+- [ ] Main menu "Open Visualizer (Butterchurn+)" starts it; first run shows the `?` hint toast
+- [ ] Timer cycles at the configured interval; a manual switch resets the timer
+- [ ] Skipping a track changes preset
+- [ ] A big drop changes preset (at most once per 20 s)
+- [ ] `N` `P` `L` `F` `B` `H` `?` `Esc` all behave; typing in the settings search box does not trigger them
+- [ ] Lock blocks timer, song and drop changes; `N` still works while locked
+- [ ] Immersive layout "Butterchurn+ Visualizer" works and closing immersive stops the visualizer
+- [ ] Open/close 10 times: no speed-up, no duplicate switches
+- [ ] Render scale 1 vs 2 visibly changes sharpness
+
+---
+
 <div align="center">
  <img src="./repo_assets/header-preivew.png" style="width: 600px;"/> 
  </div>
