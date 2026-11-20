@@ -7,13 +7,14 @@ import { createEngine } from "./engine";
 import { createHud } from "./hud";
 import { createPresetSession } from "./presetSession";
 import { settings, toggleInList } from "./settingsStore";
+import { setRunningIndicator } from "./toolbarButton";
 import { startBeatWatcher, startHotkeys, startSongWatcher, startTicker, type Dispose } from "./triggers";
 
 const MAX_CHAINED_FAILURES = 5;
 
 const audio = useCiderAudio();
 const engine = createEngine(() => settings.renderScale);
-const hud = createHud();
+const hud = createHud(() => stop());
 const session = createPresetSession((message) => hud.toast(message));
 let cycler: CyclerState = initialState(settings.selected, Date.now());
 let disposers: Dispose[] = [];
@@ -144,6 +145,8 @@ export function start() {
   const { context, source } = audio;
   if (!context || !source) return waitForAudio();
   engine.start(context, source, document.querySelector(".player-modal") !== null);
+  hud.mount();
+  setRunningIndicator(true);
   cycler = initialState(settings.selected, Date.now());
   try {
     engine.load(settings.selected, 0);
@@ -164,6 +167,7 @@ export function stop() {
   disposers = [];
   engine.stop();
   hud.unmount();
+  setRunningIndicator(false);
 }
 
 export function toggle() {

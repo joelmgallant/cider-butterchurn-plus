@@ -13,10 +13,14 @@ const ROOT_STYLE = `
 .bcplus-help-card td{padding:4px 8px}
 .bcplus-help-card kbd{display:inline-block;min-width:22px;text-align:center;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.15);font:600 13px ui-monospace,monospace}
 .bcplus-help-state{margin-top:12px;opacity:.75;font-size:13px}
+.bcplus-exit{position:absolute;top:20px;right:24px;pointer-events:auto;cursor:pointer;border:0;padding:8px 14px;border-radius:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);color:#fff;font:inherit;opacity:0;transition:opacity .4s}
+.bcplus-exit.bcplus-show{opacity:1}
+.bcplus-exit:hover{background:rgba(0,0,0,.8)}
 `;
 
 const NAME_MS = 4_000;
 const TOAST_MS = 2_500;
+const EXIT_IDLE_MS = 2_500;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text = ""): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
@@ -52,18 +56,29 @@ function buildHelpCard(onClose: () => void) {
   return { help, state };
 }
 
-/** Overlay for preset names, toasts and the hotkey cheat sheet. No Cider toast API exists. */
-export function createHud() {
+/**
+ * Overlay for preset names, toasts, the hotkey cheat sheet and a floating off button that shows on
+ * mouse movement (the full-window canvas covers Cider's own controls). No Cider toast API exists.
+ */
+export function createHud(onExit: () => void) {
   const timers = new Map<HTMLElement, number>();
   const style = el("style", "", ROOT_STYLE);
   const root = el("div", "bcplus-hud");
   const name = el("div", "bcplus-name");
   const toast = el("div", "bcplus-toast");
   const { help, state } = buildHelpCard(() => setHelp(false));
-  root.append(name, toast, help);
+  const exit = el("button", "bcplus-exit", "✕ Visualizer off");
+  exit.addEventListener("click", onExit);
+  root.append(name, toast, exit, help);
+
+  function revealExit() {
+    flash(exit, exit.textContent ?? "", EXIT_IDLE_MS, timers);
+  }
 
   function mount() {
-    if (!root.isConnected) document.body.append(style, root);
+    if (root.isConnected) return;
+    document.body.append(style, root);
+    window.addEventListener("mousemove", revealExit);
   }
 
   function setHelp(open: boolean, stateLine = "") {
@@ -86,7 +101,10 @@ export function createHud() {
     },
     isHelpOpen: () => help.classList.contains("bcplus-open"),
     setHelp,
+    mount,
     unmount() {
+      window.removeEventListener("mousemove", revealExit);
+      exit.classList.remove("bcplus-show");
       help.classList.remove("bcplus-open");
       timers.forEach((timer) => clearTimeout(timer));
       root.remove();

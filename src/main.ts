@@ -10,6 +10,7 @@ import { subscribeEvent } from "@ciderapp/pluginkit";
 import { addImmersiveLayout } from "@ciderapp/pluginkit"
 import CustomImmersiveLayout from "./components/CustomImmersiveLayout.vue";
 import pluginConfig from "./plugin.config.ts";
+import { registerToolbarButton } from "./runtime/toolbarButton";
 
 /**
  * Custom Elements that will be registered in the app
@@ -56,6 +57,8 @@ const { plugin, setupConfig, customElementName, goToPage, useCPlugin } = defineP
             component: customElementName('immersive-layout'),
             type: 'normal',
         })
+
+        registerToolbarButton(() => controller.toggle(), openConfig);
 
         addMainMenuEntry({
             label: "Open Visualizer (Butterchurn+)",

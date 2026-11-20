@@ -4,6 +4,7 @@ Fork of [booploops/Cider-Butterchurn](https://github.com/booploops/Cider-Butterc
 
 - **Auto-cycling presets**: on a timer (5–300 s), on song change, and on big bass drops, arbitrated so they never double-switch.
 - **Hotkeys** while the visualizer is showing: `N` next (random), `P` previous, `L` lock, `F` favourite, `B` blocklist + skip, `H` toggle preset name, `?` cheat sheet.
+- **Toolbar toggle**: a ✺ button in Cider's top bar toggles the visualizer (right-click for settings) and glows while it runs; a floating "✕ Visualizer off" button appears on mouse movement over the visualizer.
 - **Blocklist and favourites-only pool**, editable in the settings panel (right-click or double-click the visualizer).
 - Fixes: no AudioContext leak per toggle, no `alert()`, Retina no longer simulates 4× the pixels it shows, listeners torn down on stop.
 
